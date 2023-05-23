@@ -15,7 +15,23 @@ class MyApp extends StatelessWidget {
           minScale: 0.1,
           maxScale: 10.0,
           scaleEnabled: true,
-          child: Image.asset('assets/eventMap.png'),
+          child: Stack(
+            children: <Widget>[
+              Image.asset('assets/eventMap.png'),
+              Positioned(
+                left: 100,
+                top: 100,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: Colors.pinkAccent,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
