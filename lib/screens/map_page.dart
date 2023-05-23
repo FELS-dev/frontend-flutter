@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:math' as math;
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -18,7 +20,7 @@ class _MapPageState extends State<MapPage> {
 
     _fetchPermissionStatus();
   }
-  
+
   void _fetchPermissionStatus() {
     Permission.locationWhenInUse.status.then((value) {
       if (mounted) {
@@ -36,20 +38,47 @@ class _MapPageState extends State<MapPage> {
         appBar: AppBar(
           title: const Text('Page de navigation'),
         ),
-        body: Builder(builder: (context) {
-          if (_hasPermissions) {
-            return _buildCompass();
-          } else {
-            return _buildPermissionSheet();
-          }
-        },),
+        body: Builder(
+          builder: (context) {
+            if (_hasPermissions) {
+              return _buildCompass();
+            } else {
+              return _buildPermissionSheet();
+            }
+          },
+        ),
       ),
     );
   }
 
   Widget _buildCompass() {
-    return Container(
-      child: const Text('Compass here')
+    return StreamBuilder<CompassEvent>(
+      stream: FlutterCompass.events,
+      builder: ((context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error : ${snapshot.error}'); 
+        }
+
+        if(snapshot.connectionState == ConnectionState.waiting){
+          return const CircularProgressIndicator();
+        }
+
+        double? direction = snapshot.data!.heading;
+
+        if(direction == null){
+          return Center(child: Text('Device does not have sensors')); 
+        }
+
+        return Center(
+          child: Container(
+            padding: const EdgeInsets.all(25),
+            child: Transform.rotate(
+              angle: (direction * (math.pi / 180) * -1),
+              child: Image.asset('assets/compass.png'),
+            )
+          ),
+        );
+      }),
     );
   }
 
