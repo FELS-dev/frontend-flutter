@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 
 class ExpandableCard extends StatefulWidget {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 79d9571 (feat(Card): adapt card to be in scrollable list)
   final double maxWidth;
   final double maxHeight;
 
   const ExpandableCard(
       {Key? key, required this.maxWidth, required this.maxHeight})
       : super(key: key);
+<<<<<<< HEAD
 =======
   const ExpandableCard({super.key});
 >>>>>>> ffba754 (feat(Card): create info card stand)
+=======
+>>>>>>> 79d9571 (feat(Card): adapt card to be in scrollable list)
 
   @override
   _ExpandableCardState createState() => _ExpandableCardState();
@@ -26,6 +32,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
 <<<<<<< HEAD
+<<<<<<< HEAD
       height:
           isExpanded ? (isHeightExpanded ? widget.maxHeight : 160.0) : 200.0,
 =======
@@ -33,6 +40,10 @@ class _ExpandableCardState extends State<ExpandableCard> {
           ? (isHeightExpanded ? MediaQuery.of(context).size.height : 160.0)
           : 200.0,
 >>>>>>> ffba754 (feat(Card): create info card stand)
+=======
+      height:
+          isExpanded ? (isHeightExpanded ? widget.maxHeight : 160.0) : 200.0,
+>>>>>>> 79d9571 (feat(Card): adapt card to be in scrollable list)
       width: isWidthExpanded
           ? MediaQuery.of(context).size.width
           : MediaQuery.of(context).size.width / 2,
