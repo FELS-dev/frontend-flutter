@@ -12,6 +12,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   bool _hasPermissions = false;
+  double? d = 0.0;
 
   @override
   void initState() {
@@ -31,12 +32,18 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  void _localDirection(double? direction) {
+    setState(() {
+      d = direction;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Page de navigation'),
+          title: Text('Page de navigation ${d.toString()}'),
         ),
         body: Builder(
           builder: (context) {
