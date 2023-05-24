@@ -1,114 +1,39 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import './screens/login_page.dart';
+import './screens/interactive_map.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  MyAppState createState() => MyAppState();
-}
-
-class MyAppState extends State<MyApp> with TickerProviderStateMixin {
-  final List<Map<String, double>> markers = [
-    {'x': 0.4, 'y': 0.5},
-    {'x': 0.3, 'y': 0.45},
-  ];
-
-  final TransformationController transformationController =
-      TransformationController();
-  late AnimationController animationController;
-  late Animation<Matrix4> animationZoom;
-  double screenWidth = 0.0;
-  double screenHeight = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
-  }
-
-  void centerAndZoomOnPoint(Point point) {
-    final targetX = point.x * screenWidth;
-    final targetY = point.y * screenHeight;
-
-    final matrix = Matrix4.identity()
-      ..translate(targetX, targetY)
-      ..scale(7.0)
-      ..translate(-targetX, -targetY);
-
-    animationZoom = Matrix4Tween(
-      begin: transformationController.value,
-      end: matrix,
-    ).animate(animationController);
-
-    animationZoom.addListener(() {
-      transformationController.value = animationZoom.value;
-    });
-
-    animationController.forward(from: 0);
-  }
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            screenWidth = constraints.maxWidth;
-            screenHeight = constraints.maxHeight;
-
-            return InteractiveViewer(
-              minScale: 0.1,
-              maxScale: 10.0,
-              scaleEnabled: true,
-              transformationController: transformationController,
-              child: Stack(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/eventMap.png',
-                    height: screenHeight,
-                    width: screenWidth,
-                  ),
-                  // List all pins
-                  ...markers.map(
-                    (marker) => Positioned(
-                      left: marker['x']! * screenWidth,
-                      top: marker['y']! * screenHeight,
-                      child: Container(
-                        width: 2,
-                        height: 2,
-                        decoration: const BoxDecoration(
-                          color: Colors.pinkAccent,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        // Temp button for test recenter interactive viewer
-        floatingActionButton: FloatingActionButton(
-          onPressed: () =>
-              centerAndZoomOnPoint(Point(markers[0]['x']!, markers[0]['y']!)),
-          child: const Icon(Icons.zoom_in),
-        ),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // TRY THIS: Try running your application with "flutter run". You'll see
+        // the application has a blue toolbar. Then, without quitting the app,
+        // try changing the seedColor in the colorScheme below to Colors.green
+        // and then invoke "hot reload" (save your changes or press the "hot
+        // reload" button in a Flutter-supported IDE, or press "r" if you used
+        // the command line to start the app).
+        //
+        // Notice that the counter didn't reset back to zero; the application
+        // state is not lost during the reload. To reset the state, use hot
+        // restart instead.
+        //
+        // This works for code too, not just values: Most code changes can be
+        // tested with just a hot reload.
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
+      home: const InteractiveMap(),
     );
   }
 }
