@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/mobile_scanner.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -17,6 +17,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? scannedQRCode;
   bool showScanner = false;
+
+  void _cacheQRCode(String qrCode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('cachedQRCode', qrCode);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +42,13 @@ class _LoginPageState extends State<LoginPage> {
                     widget.qrScannerKey.currentState
                         ?.stopScan(); // Arrête la capture du QR code
                     showScanner = false;
+                    if (scannedQRCode == 'toto') {
+                      _cacheQRCode(scannedQRCode!);
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                              builder: (_) =>
+                                  const HomePage()) // Stocke le QR code en cache
+                          );
+                    }
                   });
                 },
               ),
