@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import './screens/login_page.dart';
+import './screens//home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Vérifier si un QR code est en cache
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? cachedQRCode = prefs.getString('cachedQRCode');
+
+  // Déterminer l'écran initial en fonction du QR code en cache
+  Widget initialScreen = cachedQRCode != null ? const HomePage() : LoginPage();
+  runApp(MyApp(initialScreen: initialScreen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+
+  const MyApp({required this.initialScreen, Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -32,7 +44,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: LoginPage(),
+      home: const HomePage(),
     );
   }
 }
