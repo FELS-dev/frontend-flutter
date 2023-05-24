@@ -12,7 +12,6 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   bool _hasPermissions = false;
-  double? d = 0.0;
 
   @override
   void initState() {
@@ -32,23 +31,17 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void _localDirection(double? direction) {
-    setState(() {
-      d = direction;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Page de navigation ${d.toString()}'),
+          title: Text('Page de navigation'),
         ),
         body: Builder(
           builder: (context) {
             if (_hasPermissions) {
-              return _buildCompass();
+              return _buildCompass(context);
             } else {
               return _buildPermissionSheet();
             }
@@ -58,32 +51,58 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _buildCompass() {
+  Widget _buildCompass(BuildContext context) {
     return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: ((context, snapshot) {
         if (snapshot.hasError) {
-          return Text('Error : ${snapshot.error}'); 
+          return Text('Error : ${snapshot.error}');
         }
 
-        if(snapshot.connectionState == ConnectionState.waiting){
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         }
 
         double? direction = snapshot.data!.heading;
 
-        if(direction == null){
-          return Center(child: Text('Device does not have sensors')); 
+        if (direction == null) {
+          return Center(child: Text('Device does not have sensors'));
         }
 
         return Center(
           child: Container(
-            padding: const EdgeInsets.all(25),
-            child: Transform.rotate(
-              angle: (direction * (math.pi / 180) * -1),
-              child: Image.asset('assets/compass.png'),
-            )
-          ),
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                alignment: const Alignment(-1.0 + .5 * 2, -1.0 + .9 * 2),
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          border: Border.all(
+                            color: const Color.fromARGB(125, 0, 0, 0),
+                            width: 1.0,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(100)),
+                        ),
+                        width: 128.0,
+                        height: 128.0,
+                      ),
+                      Container(
+                        width: 139.0,
+                        height: 139.0,
+                        child: Transform.rotate(
+                          angle: (direction * (math.pi / 180) * -1),
+                          child: Image.asset('assets/compass.png'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
         );
       }),
     );
