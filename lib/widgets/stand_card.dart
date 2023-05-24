@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ExpandableCard extends StatefulWidget {
-  const ExpandableCard({super.key});
+  final double maxWidth;
+  final double maxHeight;
+
+  const ExpandableCard(
+      {Key? key, required this.maxWidth, required this.maxHeight})
+      : super(key: key);
 
   @override
   _ExpandableCardState createState() => _ExpandableCardState();
@@ -16,9 +21,8 @@ class _ExpandableCardState extends State<ExpandableCard> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: isExpanded
-          ? (isHeightExpanded ? MediaQuery.of(context).size.height : 160.0)
-          : 200.0,
+      height:
+          isExpanded ? (isHeightExpanded ? widget.maxHeight : 160.0) : 200.0,
       width: isWidthExpanded
           ? MediaQuery.of(context).size.width
           : MediaQuery.of(context).size.width / 2,
