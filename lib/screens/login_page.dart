@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
                 onDetect: (List<Barcode> barcodes, Uint8List? image) {
                   setState(() {
                     scannedQRCode =
-                    barcodes.isNotEmpty ? barcodes[0].rawValue : null;
+                        barcodes.isNotEmpty ? barcodes[0].rawValue : null;
                     widget.qrScannerKey.currentState
                         ?.stopScan(); // Arrête la capture du QR code
                     showScanner = false;
@@ -67,47 +67,47 @@ class _LoginPageState extends State<LoginPage> {
       bottomNavigationBar: showScanner
           ? null
           : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFFFF0081),
-                Color(0xFFFF00E4),
-                Color(0xFFF15700),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              setState(() {
-                showScanner = true;
-              });
-              widget.qrScannerKey.currentState
-                  ?.startScan(); // Action à effectuer lorsque le bouton est cliqué
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors
-                  .transparent, // Utilisez une couleur transparente pour le bouton
-              elevation: 0, // Supprimez l'ombre du bouton
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF0081),
+                      Color(0xFFFF00E4),
+                      Color(0xFFF15700),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showScanner = true;
+                    });
+                    widget.qrScannerKey.currentState
+                        ?.startScan(); // Action à effectuer lorsque le bouton est cliqué
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors
+                        .transparent, // Utilisez une couleur transparente pour le bouton
+                    elevation: 0, // Supprimez l'ombre du bouton
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Se connecter',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ),
-            child: const Text(
-              'Se connecter',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
