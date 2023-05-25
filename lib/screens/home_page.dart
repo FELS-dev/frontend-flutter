@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Toto'),
+          title: const Text('Vivatech'),
         ),
         body: _pages[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
