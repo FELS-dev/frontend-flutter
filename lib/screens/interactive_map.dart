@@ -211,7 +211,7 @@ class InteractiveMapState extends State<InteractiveMap>
                         height: 140.0,
                         child: Transform.rotate(
                           angle: (direction * (pi / 180) * -1),
-                          child: Image.asset('assets/compass.png'),
+                          child: Image.asset('assets/images/compass.png'),
                         ),
                       ),
                     ],

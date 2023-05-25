@@ -52,7 +52,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photos access to get QR code from photo library</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs your location to provide relevant features and information when you are using it.<string>
+	<string>This app needs your location to provide relevant features and information when you are using it.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs your location to provide relevant features and information both when you are using it and in the background.</string>
 
