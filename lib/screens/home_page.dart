@@ -26,6 +26,19 @@ class _HomePageState extends State<HomePage> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Vivatech'),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFF0081),
+                  Color(0xFFFF00E4),
+                  Color(0xFFF15700),
+                ],
+              ),
+            ),
+          ),
         ),
         body: _pages[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
