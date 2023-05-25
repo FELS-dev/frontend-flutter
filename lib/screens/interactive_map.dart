@@ -93,34 +93,47 @@ class InteractiveMapState extends State<InteractiveMap>
         return Stack(
           children: <Widget>[
             InteractiveViewer(
-                minScale: 0.1,
-                maxScale: 10.0,
-                scaleEnabled: true,
-                transformationController: transformationController,
-                child: Stack(
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/eventMap.png',
-                      height: screenHeight,
-                      width: screenWidth,
-                    ),
-                    // List all pins
-                    ...markers.map(
-                      (marker) => Positioned(
-                        left: marker['x']! * screenWidth,
-                        top: marker['y']! * screenHeight,
-                        child: Container(
-                          width: 2,
-                          height: 2,
-                          decoration: const BoxDecoration(
-                            color: Colors.pinkAccent,
-                            shape: BoxShape.circle,
-                          ),
+              minScale: 0.1,
+              maxScale: 10.0,
+              scaleEnabled: true,
+              transformationController: transformationController,
+              child: Stack(
+                children: <Widget>[
+                  Image.asset(
+                    'assets/images/eventMap.png',
+                    height: screenHeight,
+                    width: screenWidth,
+                  ),
+                  // List all pins
+                  ...markers.map(
+                    (marker) => Positioned(
+                      left: marker['x']! * screenWidth,
+                      top: marker['y']! * screenHeight,
+                      child: Container(
+                        width: 2,
+                        height: 2,
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
                         ),
                       ),
                     ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
+            IgnorePointer(
+              ignoring: true,
+              child: Builder(
+                builder: (context) {
+                  if (_hasPermissions) {
+                    return _buildCompass(context);
+                  } else {
+                    return _buildPermissionSheet();
+                  }
+                },
+              ),
+            ),
             Align(
               alignment: Alignment.bottomLeft,
               child: LayoutBuilder(
