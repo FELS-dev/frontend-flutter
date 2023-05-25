@@ -11,6 +11,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  List<Map<String, String>> cardData = [
+    {'title': 'Title 1', 'text': 'Lorem ipsum 1'},
+    {'title': 'Title 2', 'text': 'Lorem ipsum 2'},
+    {'title': 'Title 3', 'text': 'Lorem ipsum 3'},
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -24,41 +30,26 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: const Text('Toto'),
         ),
-        body: Stack(
-          children: [
-            Positioned.fill(
-              bottom: kBottomNavigationBarHeight,
-              child: Container(
-                  // Content of the screen
-                  ),
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: SizedBox(
-                height: 200,
-                // Ajustez la hauteur en fonction de vos besoins
-                child: ListView.builder(
-                  clipBehavior: Clip.hardEdge,
+        body: Align(
+          alignment: Alignment.bottomLeft,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  itemCount:
-                      5, // Remplacez par le nombre d'ExpandableCard souhaitées
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return ExpandableCard(
-                            maxWidth: constraints.maxWidth,
-                            maxHeight: constraints.maxHeight,
-                          );
-                        },
-                      ),
-                    );
-                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: cardData.map((data) {
+                      return ExpandableCard(
+                        title: data['title']!,
+                        text: data['text']!,
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           selectedItemColor: const Color(0xFF5508A0),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ExpandableCard extends StatefulWidget {
-  final double maxWidth;
-  final double maxHeight;
-
-  const ExpandableCard(
-      {Key? key, required this.maxWidth, required this.maxHeight})
+  final String title;
+  final String text;
+  const ExpandableCard({Key? key, required this.title, required this.text})
       : super(key: key);
 
   @override
@@ -13,18 +11,17 @@ class ExpandableCard extends StatefulWidget {
 }
 
 class _ExpandableCardState extends State<ExpandableCard> {
-  bool isExpanded = false;
   bool isWidthExpanded = false;
   bool isHeightExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
+      margin: const EdgeInsets.all(8.0),
       duration: const Duration(milliseconds: 200),
-      height:
-          isExpanded ? (isHeightExpanded ? widget.maxHeight : 160.0) : 200.0,
+      height: isHeightExpanded ? MediaQuery.of(context).size.height : 160.0,
       width: isWidthExpanded
-          ? MediaQuery.of(context).size.width
+          ? MediaQuery.of(context).size.width - 16
           : MediaQuery.of(context).size.width / 2,
       child: Card(
         color: Colors.black,
@@ -66,8 +63,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                           Container(
                             constraints: const BoxConstraints(maxHeight: 200),
                             child: AspectRatio(
-                              aspectRatio: 16 /
-                                  9, // Remplacez par le ratio d'aspect souhaité
+                              aspectRatio: 16 / 9,
                               child: Image.asset(
                                 'assets/images/paris.jpeg',
                                 fit: BoxFit.cover,
@@ -76,9 +72,9 @@ class _ExpandableCardState extends State<ExpandableCard> {
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 5)),
-                          const Text(
-                            'Title',
-                            style: TextStyle(color: Colors.white),
+                          Text(
+                            widget.title,
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       ),
@@ -104,24 +100,23 @@ class _ExpandableCardState extends State<ExpandableCard> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Title',
-                                    style: TextStyle(color: Colors.white),
+                                  Text(
+                                    widget.title,
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  const Text(
-                                    'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.',
-                                    style: TextStyle(
+                                  Text(
+                                    widget.text,
+                                    style: const TextStyle(
                                         color: Colors.grey, fontSize: 10),
                                   ),
                                   InkWell(
                                     onTap: () {
                                       setState(() {
                                         isHeightExpanded = true;
-                                        isExpanded = true;
                                       });
                                     },
                                     child: const Text(
-                                      'Toto',
+                                      'Plus d\'infos',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   )
@@ -139,21 +134,24 @@ class _ExpandableCardState extends State<ExpandableCard> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset(
-                            'assets/images/paris.jpeg',
-                            fit: BoxFit.cover,
+                          Flexible(
+                            child: Image.asset(
+                              'assets/images/paris.jpeg',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 12)),
-                          const Text(
-                            'Title',
-                            style: TextStyle(color: Colors.white),
+                          Text(
+                            widget.title,
+                            style: const TextStyle(color: Colors.white),
                           ),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 12)),
-                          const Text(
-                            'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, ',
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          Text(
+                            widget.text,
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 14),
                           ),
                         ],
                       ),
