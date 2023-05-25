@@ -1,8 +1,11 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:front_end/widgets/stand_card.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import '../widgets/mobile_scanner.dart';
 
 void main() {
   runApp(const InteractiveMap());
@@ -18,7 +21,7 @@ class InteractiveMap extends StatefulWidget {
 class InteractiveMapState extends State<InteractiveMap>
     with TickerProviderStateMixin {
   final List<Map<String, double>> markers = [
-    {'x': 0.4, 'y': 0.5},
+    {'x': 0.5, 'y': 0.5},
     {'x': 0.3, 'y': 0.45},
   ];
   List<Map<String, String>> cardData = [
@@ -32,8 +35,12 @@ class InteractiveMapState extends State<InteractiveMap>
   late Animation<Matrix4> animationZoom;
   double screenWidth = 0.0;
   double screenHeight = 0.0;
-
+  bool _hasScannedQR = false;
   bool _hasPermissions = false;
+  bool showScanner = false;
+  Map<String, double>? scannedPoint;
+
+  final qrScannerKey = GlobalKey<QRScannerWidgetState>();
 
   @override
   void initState() {
@@ -155,15 +162,59 @@ class InteractiveMapState extends State<InteractiveMap>
                 },
               ),
             ),
+            if (showScanner)
+              Expanded(
+                child: QRScannerWidget(
+                  key: qrScannerKey,
+                  onDetect: (List<Barcode> barcodes, Uint8List? image) {
+                    setState(
+                      () {
+                        if (barcodes.isNotEmpty) {
+                          var parts = barcodes[0].rawValue?.split(',');
+                          if (parts!.length == 2) {
+                            var x = double.tryParse(parts[0].trim());
+                            var y = double.tryParse(parts[1].trim());
+
+                            if (x != null && y != null) {
+                              scannedPoint = {'x': x, 'y': y};
+                              _hasScannedQR = true;
+                              qrScannerKey.currentState?.stopScan();
+                              showScanner = false;
+                              centerAndZoomOnPoint(
+                                Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                              );
+                            }
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
             Positioned(
               top: 16.0,
               right: 16.0,
               child: FloatingActionButton(
-                onPressed: () => centerAndZoomOnPoint(
-                    Point(markers[0]['x']!, markers[0]['y']!)),
-                child: const Icon(Icons.zoom_in),
+                onPressed: () {
+                  setState(() {
+                    showScanner = true;
+                  });
+                  qrScannerKey.currentState?.startScan();
+                },
+                child: const Icon(Icons.qr_code_scanner),
               ),
             ),
+            if (_hasScannedQR && scannedPoint != null)
+              Positioned(
+                top: 86.0,
+                right: 16.0,
+                child: FloatingActionButton(
+                  onPressed: () => centerAndZoomOnPoint(
+                    Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                  ),
+                  child: const Icon(Icons.my_location),
+                ),
+              ),
           ],
         );
       },
