@@ -24,30 +24,22 @@ class _ExpandableCardState extends State<ExpandableCard> {
           ? MediaQuery.of(context).size.width - 16
           : MediaQuery.of(context).size.width / 2,
       child: Card(
-        color: Colors.black,
+        color: Colors.transparent,
         child: Stack(
           children: [
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: IconButton(
-                color: Colors.grey.shade400,
-                icon: Icon(
-                  isWidthExpanded
-                      ? isHeightExpanded
-                          ? Icons.close
-                          : Icons.close_fullscreen
-                      : Icons.open_in_new_outlined,
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFFF0081),
+                      Color(0xFFFF00E4),
+                      Color(0xFFF15700),
+                    ],
+                  ),
                 ),
-                onPressed: () {
-                  setState(() {
-                    if (isHeightExpanded) {
-                      isHeightExpanded = !isHeightExpanded;
-                    } else {
-                      isWidthExpanded = !isWidthExpanded;
-                    }
-                  });
-                },
               ),
             ),
             Container(
@@ -157,6 +149,29 @@ class _ExpandableCardState extends State<ExpandableCard> {
                       ),
                     ),
                 ],
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: IconButton(
+                color: Colors.grey.shade400,
+                icon: Icon(
+                  isWidthExpanded
+                      ? isHeightExpanded
+                          ? Icons.close
+                          : Icons.close_fullscreen
+                      : Icons.open_in_new_outlined,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (isHeightExpanded) {
+                      isHeightExpanded = !isHeightExpanded;
+                    } else {
+                      isWidthExpanded = !isWidthExpanded;
+                    }
+                  });
+                },
               ),
             ),
           ],
