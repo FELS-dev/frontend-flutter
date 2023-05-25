@@ -97,25 +97,29 @@ class InteractiveMapState extends State<InteractiveMap>
               maxScale: 10.0,
               scaleEnabled: true,
               transformationController: transformationController,
-              child: Image.asset(
-                'assets/images/eventMap.png',
-                height: screenHeight,
-                width: screenWidth,
-              ),
-            ),
-            // List all pins
-            ...markers.map(
-              (marker) => Positioned(
-                left: marker['x']! * screenWidth,
-                top: marker['y']! * screenHeight,
-                child: Container(
-                  width: 2,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    color: Colors.pinkAccent,
-                    shape: BoxShape.circle,
+              child: Stack(
+                children: <Widget>[
+                  Image.asset(
+                    'assets/images/eventMap.png',
+                    height: screenHeight,
+                    width: screenWidth,
                   ),
-                ),
+                  // List all pins
+                  ...markers.map(
+                    (marker) => Positioned(
+                      left: marker['x']! * screenWidth,
+                      top: marker['y']! * screenHeight,
+                      child: Container(
+                        width: 2,
+                        height: 2,
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             IgnorePointer(
