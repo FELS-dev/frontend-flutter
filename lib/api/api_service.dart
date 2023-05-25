@@ -8,7 +8,7 @@ import '../models/visitor.dart';
 import '../database/database_helper.dart';
 
 class ApiService {
-  final String _baseUrl = "http://192.168.1.100:3001";
+  final String _baseUrl = "http://10.0.2.2:3000";
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
   Future<List<Stand>> getStands() async {
