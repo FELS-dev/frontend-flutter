@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:front_end/widgets/stand_card.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 
 void main() {
   runApp(const InteractiveMap());
@@ -31,6 +33,8 @@ class InteractiveMapState extends State<InteractiveMap>
   double screenWidth = 0.0;
   double screenHeight = 0.0;
 
+  bool _hasPermissions = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +42,18 @@ class InteractiveMapState extends State<InteractiveMap>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
+
+    _fetchPermissionStatus();
+  }
+
+  void _fetchPermissionStatus() {
+    Permission.locationWhenInUse.status.then((value) {
+      if (mounted) {
+        setState(() {
+          _hasPermissions = (value == PermissionStatus.granted);
+        });
+      }
+    });
   }
 
   @override
@@ -138,6 +154,76 @@ class InteractiveMapState extends State<InteractiveMap>
           ],
         );
       },
+    );
+  }
+
+  Widget _buildCompass(BuildContext context) {
+    return StreamBuilder<CompassEvent>(
+      stream: FlutterCompass.events,
+      builder: ((context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error : ${snapshot.error}');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        double? direction = snapshot.data!.heading;
+
+        if (direction == null) {
+          return Center(child: Text('Device does not have sensors'));
+        }
+
+        return Center(
+          child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                alignment: const Alignment(-1.0 + .5 * 2, -1.0 + .7 * 2),
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          border: Border.all(
+                            color: const Color.fromARGB(125, 0, 0, 0),
+                            width: 2.0,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(100)),
+                        ),
+                        width: 128.0,
+                        height: 128.0,
+                      ),
+                      Container(
+                        width: 140.0,
+                        height: 140.0,
+                        child: Transform.rotate(
+                          angle: (direction * (pi / 180) * -1),
+                          child: Image.asset('assets/images/compass.png'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
+        );
+      }),
+    );
+  }
+
+  Widget _buildPermissionSheet() {
+    return Center(
+      child: ElevatedButton(
+        child: const Text('Request permissions'),
+        onPressed: () {
+          Permission.locationWhenInUse.request().then((value) {
+            _fetchPermissionStatus();
+          });
+        },
+      ),
     );
   }
 }
