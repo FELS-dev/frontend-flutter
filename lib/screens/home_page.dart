@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:front_end/widgets/stand_card.dart';
+import 'package:front_end/screens/interactive_map.dart';
+import 'package:front_end/screens/qr_code.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,19 +10,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  int currentIndex = 0;
 
-  List<Map<String, String>> cardData = [
-    {'title': 'Title 1', 'text': 'Lorem ipsum 1'},
-    {'title': 'Title 2', 'text': 'Lorem ipsum 2'},
-    {'title': 'Title 3', 'text': 'Lorem ipsum 3'},
-  ];
-
-  void _onItemTapped(int index) {
+  void onTabTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      currentIndex = index;
     });
   }
+
+  static const List<Widget> _pages = <Widget>[QRCodePage(), InteractiveMap()];
 
   @override
   Widget build(BuildContext context) {
@@ -30,27 +27,7 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: const Text('Toto'),
         ),
-        body: Align(
-          alignment: Alignment.bottomLeft,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SizedBox(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: cardData.map((data) {
-                      return ExpandableCard(
-                        title: data['title']!,
-                        text: data['text']!,
-                      );
-                    }).toList(),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+        body: _pages[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           selectedItemColor: const Color(0xFF5508A0),
           iconSize: 32,
@@ -68,8 +45,8 @@ class _HomePageState extends State<HomePage> {
               label: '',
             ),
           ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+          currentIndex: currentIndex,
+          onTap: onTabTapped,
         ),
       ),
     );
