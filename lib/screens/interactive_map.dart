@@ -185,11 +185,11 @@ class InteractiveMapState extends State<InteractiveMap>
         double? direction = snapshot.data!.heading;
 
         if (direction == null) {
-          return Center(child: Text('Device does not have sensors'));
+          return const Center(child: Text('Device does not have sensors'));
         }
 
         return Center(
-          child: Container(
+          child: SizedBox(
               height: MediaQuery.of(context).size.height,
               child: Stack(
                 alignment: const Alignment(-1.0 + .5 * 2, -1.0 + .7 * 2),
@@ -199,7 +199,7 @@ class InteractiveMapState extends State<InteractiveMap>
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: const Color.fromARGB(132, 224, 224, 224),
                           border: Border.all(
                             color: const Color.fromARGB(125, 0, 0, 0),
                             width: 2.0,
@@ -210,7 +210,7 @@ class InteractiveMapState extends State<InteractiveMap>
                         width: 128.0,
                         height: 128.0,
                       ),
-                      Container(
+                      SizedBox(
                         width: 140.0,
                         height: 140.0,
                         child: Transform.rotate(

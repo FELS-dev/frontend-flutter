@@ -1,12 +1,10 @@
-import 'dart:convert';
-import './choice.dart';
-
 class TreasureHunt {
   int id;
   int standId;
   String question;
 
-  TreasureHunt({required this.id, required this.standId, required this.question});
+  TreasureHunt(
+      {required this.id, required this.standId, required this.question});
 
   factory TreasureHunt.fromJson(Map<String, dynamic> json) {
     return TreasureHunt(
@@ -23,5 +21,4 @@ class TreasureHunt {
       'question': question,
     };
   }
-
 }

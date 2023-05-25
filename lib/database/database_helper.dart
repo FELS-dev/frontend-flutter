@@ -1,4 +1,3 @@
-// DatabaseHelper.dart
 import 'dart:io';
 import 'package:front_end/models/visitor.dart';
 import 'package:path/path.dart';
@@ -42,7 +41,7 @@ class DatabaseHelper {
   Future<void> deleteDb() async {
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, _databaseName);
-    print(path);
+
     // Close the database
     if (_database != null) {
       await _database!.close();
@@ -159,13 +158,15 @@ class DatabaseHelper {
   // insert Treasure Hunt into the database
   Future<int> insertTreasureHunt(TreasureHunt treasureHunt) async {
     Database db = await instance.database;
-    return await db.insert(treasureHuntTable, treasureHunt.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(treasureHuntTable, treasureHunt.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   // insert Choice into the database
   Future<int> insertChoice(Choice choice) async {
     Database db = await instance.database;
-    return await db.insert(choiceTable, choice.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(choiceTable, choice.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   // get Treasure Hunts from the database
@@ -191,16 +192,19 @@ class DatabaseHelper {
   // get Treasure Hunts for a specific stand from the database
   Future<List<TreasureHunt>> getTreasureHuntsByStandId(int id) async {
     final db = await database;
-    var result = await db.query(treasureHuntTable, where: 'stand_id = ?', whereArgs: [id]);
+    var result = await db
+        .query(treasureHuntTable, where: 'stand_id = ?', whereArgs: [id]);
     List<TreasureHunt> treasureHunts = result.isNotEmpty
         ? result.map((item) => TreasureHunt.fromJson(item)).toList()
         : [];
     return treasureHunts;
   }
+
   // get Choices for a specific Treasure Hunt from the database
   Future<List<Choice>> getChoicesByHuntId(int huntId) async {
     Database db = await instance.database;
-    var choices = await db.query(choiceTable, where: 'hunt_id = ?', whereArgs: [huntId]);
+    var choices =
+        await db.query(choiceTable, where: 'hunt_id = ?', whereArgs: [huntId]);
     List<Choice> choiceList = choices.isNotEmpty
         ? choices.map((c) => Choice.fromJson(c)).toList()
         : [];
@@ -252,6 +256,7 @@ class DatabaseHelper {
       return Stand.fromJson(maps[i] as Map<String, dynamic>);
     });
   }
+
   Future<void> addProgress(UserTreasureHuntProgress progress) async {
     final db = await database;
     await db.insert(
@@ -266,4 +271,3 @@ class DatabaseHelper {
     );
   }
 }
-

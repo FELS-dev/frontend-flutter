@@ -7,10 +7,10 @@ class ExpandableCard extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ExpandableCardState createState() => _ExpandableCardState();
+  ExpandableCardState createState() => ExpandableCardState();
 }
 
-class _ExpandableCardState extends State<ExpandableCard> {
+class ExpandableCardState extends State<ExpandableCard> {
   bool isWidthExpanded = false;
   bool isHeightExpanded = false;
 

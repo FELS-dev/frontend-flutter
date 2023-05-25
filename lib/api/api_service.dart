@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:sqflite/sqflite.dart';
 import '../models/choice.dart';
 import '../models/stand.dart';
 import '../models/treasure_hunt.dart';
@@ -19,7 +18,8 @@ class ApiService {
 
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body)['data']['stands'];
-        List<Stand> standsList = jsonResponse.map((item) => Stand.fromJson(item)).toList();
+        List<Stand> standsList =
+            jsonResponse.map((item) => Stand.fromJson(item)).toList();
 
         // Insert or update stands in the local database
         for (Stand stand in standsList) {
@@ -53,7 +53,6 @@ class ApiService {
       // If network request fails, load stands from local database
       return await _databaseHelper.getStands();
     }
-
   }
 
   Future<void> addVisitor() async {
@@ -86,7 +85,8 @@ class ApiService {
   }
 
   Future<List<TreasureHunt>> getQuestion(int standId) async {
-    List<TreasureHunt> question = await _databaseHelper.getTreasureHuntsByStandId(standId);
+    List<TreasureHunt> question =
+        await _databaseHelper.getTreasureHuntsByStandId(standId);
     return question;
   }
 
@@ -94,6 +94,4 @@ class ApiService {
     List<Choice> choices = await _databaseHelper.getChoicesByHuntId(questionId);
     return choices;
   }
-
-
 }
