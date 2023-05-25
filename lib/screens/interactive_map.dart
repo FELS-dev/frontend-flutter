@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:front_end/widgets/stand_card.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:front_end/api/api_service.dart';
+
+import '../models/stand.dart';
 
 void main() {
   runApp(const InteractiveMap());
@@ -34,7 +37,6 @@ class InteractiveMapState extends State<InteractiveMap>
   double screenHeight = 0.0;
 
   bool _hasPermissions = false;
-
   @override
   void initState() {
     super.initState();
@@ -42,8 +44,18 @@ class InteractiveMapState extends State<InteractiveMap>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
-
     _fetchPermissionStatus();
+  }
+
+  Future<List<Stand>> fetchStands() async {
+    try {
+      List<Stand> stands = await ApiService().getStands();
+      return stands;
+    } catch (e) {
+      // Gérez les erreurs ou renvoyez une liste vide si nécessaire
+      print('Error fetching stands: $e');
+      return [];
+    }
   }
 
   void _fetchPermissionStatus() {
@@ -85,92 +97,112 @@ class InteractiveMapState extends State<InteractiveMap>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        screenWidth = constraints.maxWidth;
-        screenHeight = constraints.maxHeight;
+    return FutureBuilder<List<Stand>>(
+      future: fetchStands(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Afficher un indicateur de chargement pendant que les stands sont récupérés
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // Afficher un message d'erreur s'il y a une erreur lors de la récupération des stands
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          // Afficher le widget avec les stands une fois qu'ils sont récupérés avec succès
+          List<Stand> standsList = snapshot.data!;
 
-        return Stack(
-          children: <Widget>[
-            InteractiveViewer(
-              minScale: 0.1,
-              maxScale: 10.0,
-              scaleEnabled: true,
-              transformationController: transformationController,
-              child: Stack(
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              screenWidth = constraints.maxWidth;
+              screenHeight = constraints.maxHeight;
+
+              return Stack(
                 children: <Widget>[
-                  Image.asset(
-                    'assets/images/eventMap.png',
-                    height: screenHeight,
-                    width: screenWidth,
-                  ),
-                  // List all pins
-                  ...markers.map(
-                    (marker) => Positioned(
-                      left: marker['x']! * screenWidth,
-                      top: marker['y']! * screenHeight,
-                      child: Container(
-                        width: 2,
-                        height: 2,
-                        decoration: const BoxDecoration(
-                          color: Colors.pinkAccent,
-                          shape: BoxShape.circle,
+                  InteractiveViewer(
+                    minScale: 0.1,
+                    maxScale: 10.0,
+                    scaleEnabled: true,
+                    transformationController: transformationController,
+                    child: Stack(
+                      children: <Widget>[
+                        Image.asset(
+                          'assets/images/eventMap.png',
+                          height: screenHeight,
+                          width: screenWidth,
                         ),
-                      ),
+                        // List all pins
+                        ...markers.map(
+                          (marker) => Positioned(
+                            left: marker['x']! * screenWidth,
+                            top: marker['y']! * screenHeight,
+                            child: Container(
+                              width: 2,
+                              height: 2,
+                              decoration: const BoxDecoration(
+                                color: Colors.pinkAccent,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IgnorePointer(
+                    ignoring: true,
+                    child: Builder(
+                      builder: (context) {
+                        if (_hasPermissions) {
+                          return _buildCompass(context);
+                        } else {
+                          return _buildPermissionSheet();
+                        }
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SizedBox(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: standsList.map((stand) {
+                                return ExpandableCard(
+                                  title: stand.name!,
+                                  text: stand.description!,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 16.0,
+                    right: 16.0,
+                    child: FloatingActionButton(
+                      onPressed: () => centerAndZoomOnPoint(
+                          Point(markers[0]['x']!, markers[0]['y']!)),
+                      child: const Icon(Icons.zoom_in),
                     ),
                   ),
                 ],
-              ),
-            ),
-            IgnorePointer(
-              ignoring: _hasPermissions,
-              child: Builder(
-                builder: (context) {
-                  if (_hasPermissions) {
-                    return _buildCompass(context);
-                  } else {
-                    return _buildPermissionSheet();
-                  }
-                },
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SizedBox(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: cardData.map((data) {
-                          return ExpandableCard(
-                            title: data['title']!,
-                            text: data['text']!,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Positioned(
-              top: 16.0,
-              right: 16.0,
-              child: FloatingActionButton(
-                onPressed: () => centerAndZoomOnPoint(
-                    Point(markers[0]['x']!, markers[0]['y']!)),
-                child: const Icon(Icons.zoom_in),
-              ),
-            ),
-          ],
-        );
+              );
+            },
+          );
+        } else {
+          // Afficher un message par défaut si les stands ne sont pas disponibles
+          return Text('No stands available.');
+        }
       },
     );
   }
 
   Widget _buildCompass(BuildContext context) {
+    // Votre code pour construire le widget de la boussole
     return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: ((context, snapshot) {
