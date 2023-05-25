@@ -4,6 +4,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../api/api_service.dart';
+import '../database/database_helper.dart';
+import '../models/choice.dart';
+import '../models/stand.dart';
+import '../models/treasure_hunt.dart';
 import '../widgets/mobile_scanner.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,6 +20,38 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    // DatabaseHelper databaseHelper = DatabaseHelper.instance;
+    // await databaseHelper.deleteDb();
+    var apiService = ApiService();
+    var data = await apiService.addVisitor();
+    print('Fetching stands...');
+    List<Stand> stands = await apiService.getStands();
+    print('Fetched ${stands.length} stands.');
+    for (Stand stand in stands) {
+      print('Stand id: ${stand.id}');
+      List<TreasureHunt> questions = (await apiService.getQuestion(stand.id)).cast<TreasureHunt>();
+      for (TreasureHunt question in questions) {
+        print('Question: ${question.question}');
+      }
+      // getStandDetails(stand);
+    }
+    print('ici');
+
+  }
+  void getStandDetails(Stand stand) {
+    print('Stand ID: ${stand.id}');
+    print('Stand Name: ${stand.name}');
+    // if (stand.treasureHunts != null) {
+    //   print('Treasure Hunt Question: ${stand.treasureHunts}');
+    // }
+  }
   String? scannedQRCode;
   bool showScanner = false;
   @override
