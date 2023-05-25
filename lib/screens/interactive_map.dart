@@ -123,7 +123,7 @@ class InteractiveMapState extends State<InteractiveMap>
               ),
             ),
             IgnorePointer(
-              ignoring: true,
+              ignoring: _hasPermissions,
               child: Builder(
                 builder: (context) {
                   if (_hasPermissions) {
