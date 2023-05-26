@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:typed_data';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/mobile_scanner.dart';
 import 'home_page.dart';
 
@@ -14,13 +15,41 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   String? scannedQRCode;
   bool showScanner = false;
+  bool showIcon = false;
+  bool iconSucces = false;
+
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _cacheQRCode(String qrCode) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('cachedQRCode', qrCode);
+  }
+
+  void redirectToHomePage() {
+    Duration duration = const Duration(seconds: 3);
+    Timer(duration, homeNav);
+  }
+
+  void homeNav() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomePage()),
+    );
   }
 
   @override
@@ -31,7 +60,31 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Stack(
         children: [
-          if (showScanner && scannedQRCode == null)
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/images/vivatech.png'),
+                if (showIcon)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        iconSucces ? 'QR Code scanné' : 'QR Code non reconnu',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      Icon(
+                        iconSucces ? Icons.check : Icons.warning,
+                        color: iconSucces ? Colors.green : Colors.red,
+                        size: 40,
+                      )
+                    ],
+                  ).animate().fade(delay: 500.ms).scale(),
+              ],
+            ),
+          ),
+
+          if (showScanner)
             Expanded(
               child: QRScannerWidget(
                 key: widget.qrScannerKey,
@@ -42,45 +95,23 @@ class _LoginPageState extends State<LoginPage> {
                     widget.qrScannerKey.currentState
                         ?.stopScan(); // Arrête la capture du QR code
                     showScanner = false;
-                    if (scannedQRCode == 'toto') {
+                    showIcon = true;
+                    if (scannedQRCode == 'vivatech') {
                       _cacheQRCode(scannedQRCode!);
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                              builder: (_) =>
-                                  const HomePage()) // Stocke le QR code en cache
-                          );
+                      iconSucces = true;
+                      redirectToHomePage();
                     }
                   });
                 },
               ),
             ),
           // Autres widgets de la page de connexion
-          if (scannedQRCode != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    QrImageView(
-                      data: scannedQRCode!,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                    Text(scannedQRCode!)
-                  ],
-                ),
-              ),
-            ),
         ],
       ),
       bottomNavigationBar: showScanner
           ? null
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
@@ -98,6 +129,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     setState(() {
                       showScanner = true;
+                      showIcon = false;
+                      iconSucces = false;
                     });
                     widget.qrScannerKey.currentState
                         ?.startScan(); // Action à effectuer lorsque le bouton est cliqué
