@@ -26,6 +26,8 @@ class InteractiveMapState extends State<InteractiveMap>
     {'title': 'Title 2', 'text': 'Lorem ipsum 2'},
     {'title': 'Title 3', 'text': 'Lorem ipsum 3'},
   ];
+
+  final ScrollController scrollController = ScrollController();
   final TransformationController transformationController =
       TransformationController();
   late AnimationController animationController;
@@ -83,6 +85,14 @@ class InteractiveMapState extends State<InteractiveMap>
     animationController.forward(from: 0);
   }
 
+  void scrollToCard(int index, double width) {
+    scrollController.animateTo(
+      (width / 2) * index + 16.0 * index,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -105,20 +115,33 @@ class InteractiveMapState extends State<InteractiveMap>
                     width: screenWidth,
                   ),
                   // List all pins
-                  ...markers.map(
-                    (marker) => Positioned(
-                      left: marker['x']! * screenWidth,
-                      top: marker['y']! * screenHeight,
-                      child: Container(
-                        width: 2,
-                        height: 2,
-                        decoration: const BoxDecoration(
-                          color: Colors.pinkAccent,
-                          shape: BoxShape.circle,
+                  ...[
+                    for (int i = 0; i < markers.length; i++)
+                      Positioned(
+                        left: markers[i]['x']! * screenWidth,
+                        top: markers[i]['y']! * screenHeight,
+                        child: InkWell(
+                          onTap: () => scrollToCard(
+                              i, MediaQuery.of(context).size.width),
+                          child: ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFFFF0081),
+                                Color(0xFFFF00E4),
+                                Color(0xFFF15700),
+                              ],
+                            ).createShader(bounds),
+                            child: const Icon(
+                              Icons.location_on,
+                              size: 10.0,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
+                      )
+                  ]
                 ],
               ),
             ),
@@ -140,6 +163,7 @@ class InteractiveMapState extends State<InteractiveMap>
                 builder: (context, constraints) {
                   return SizedBox(
                     child: SingleChildScrollView(
+                      controller: scrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
