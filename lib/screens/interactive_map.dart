@@ -26,12 +26,43 @@ class InteractiveMapState extends State<InteractiveMap>
     {'x': 0.2, 'y': 0.55},
   ];
   List<Map<String, String>> standsList = [
-    {'name': 'Title 1', 'description': 'Lorem ipsum 1'},
-    {'name': 'Title 2', 'description': 'Lorem ipsum 2'},
-    {'name': 'Title 3', 'description': 'Lorem ipsum 3'},
+    {
+      'name': 'Nouvelles technologies',
+      'description':
+          'Les nouvelles technologies ont révolutionné notre façon de communiquer, permettant des interactions instantanées à travers le monde grâce aux réseaux sociaux, aux applications de messagerie et aux appels vidéo.',
+      'image': 'assets/images/paris.jpeg'
+    },
+    {
+      'name': 'Intelligence artificielle',
+      'description':
+          "L'intelligence artificielle et l'apprentissage automatique ont ouvert de nouvelles perspectives dans de nombreux domaines, tels que la médecine, l'automatisation industrielle et la conduite autonome, en permettant aux machines d'apprendre, d'analyser et de prendre des décisions.",
+      'image': 'assets/images/test.jpeg'
+    },
+    {
+      'name': "L'énergie solaire",
+      'description':
+          "Les progrès dans les technologies de l'énergie solaire, éolienne et hydraulique favorisent le développement des énergies renouvelables, créant ainsi des solutions plus durables pour répondre à nos besoins énergétiques croissants.",
+      'image': 'assets/images/vivatech5.jpeg'
+    },
+    {
+      'name': "Les objets connectés",
+      'description':
+          "Les objets connectés, tels que les montres intelligentes, les assistants vocaux et les appareils domotiques, ont transformé nos foyers en environnements intelligents, nous permettant de contrôler et de surveiller nos appareils à distance.",
+      'image': 'assets/images/vivatech4.jpeg'
+    },
+    {
+      'name': "L'électrique",
+      'description':
+          "Les véhicules électriques et les avancées dans les technologies de stockage de l'énergie contribuent à une transition vers une mobilité plus durable, réduisant ainsi les émissions de gaz à effet de serre et l'empreinte carbone.",
+      'image': 'assets/images/vivatech3.jpeg'
+    },
+    {
+      'name': 'La robotique',
+      'description':
+          "Les progrès dans le domaine de la robotique ouvrent de nouvelles possibilités dans l'industrie, la médecine et l'assistance aux personnes, avec des robots capables d'exécuter des tâches complexes, de collaborer avec les humains et d'améliorer notre qualité de vie.",
+      'image': 'assets/images/vivatech2.jpeg'
+    },
   ];
-
-  final ScrollController scrollController = ScrollController();
   final TransformationController transformationController =
       TransformationController();
   late AnimationController animationController;
@@ -93,14 +124,6 @@ class InteractiveMapState extends State<InteractiveMap>
     animationController.forward(from: 0);
   }
 
-  void scrollToCard(int index, double width) {
-    scrollController.animateTo(
-      (width / 2) * index + 16.0 * index,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeOut,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -123,33 +146,20 @@ class InteractiveMapState extends State<InteractiveMap>
                     width: screenWidth,
                   ),
                   // List all pins
-                  ...[
-                    for (int i = 0; i < markers.length; i++)
-                      Positioned(
-                        left: markers[i]['x']! * screenWidth,
-                        top: markers[i]['y']! * screenHeight,
-                        child: InkWell(
-                          onTap: () => scrollToCard(
-                              i, MediaQuery.of(context).size.width),
-                          child: ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFFFF0081),
-                                Color(0xFFFF00E4),
-                                Color(0xFFF15700),
-                              ],
-                            ).createShader(bounds),
-                            child: const Icon(
-                              Icons.location_on,
-                              size: 10.0,
-                              color: Colors.white,
-                            ),
-                          ),
+                  ...markers.map(
+                    (marker) => Positioned(
+                      left: marker['x']! * screenWidth,
+                      top: marker['y']! * screenHeight,
+                      child: Container(
+                        width: 2,
+                        height: 2,
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
                         ),
-                      )
-                  ]
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -171,7 +181,6 @@ class InteractiveMapState extends State<InteractiveMap>
                 builder: (context, constraints) {
                   return SizedBox(
                     child: SingleChildScrollView(
-                      controller: scrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -179,6 +188,7 @@ class InteractiveMapState extends State<InteractiveMap>
                           return ExpandableCard(
                             title: stand['name']!,
                             text: stand['description']!,
+                            image: stand['image']!,
                           );
                         }).toList(),
                       ),
