@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:front_end/widgets/stand_card.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:front_end/api/api_service.dart';
@@ -21,7 +23,7 @@ class InteractiveMap extends StatefulWidget {
 class InteractiveMapState extends State<InteractiveMap>
     with TickerProviderStateMixin {
   final List<Map<String, double>> markers = [
-    {'x': 0.4, 'y': 0.5},
+    {'x': 0.5, 'y': 0.5},
     {'x': 0.3, 'y': 0.45},
   ];
   List<Map<String, String>> cardData = [
@@ -35,7 +37,7 @@ class InteractiveMapState extends State<InteractiveMap>
   late Animation<Matrix4> animationZoom;
   double screenWidth = 0.0;
   double screenHeight = 0.0;
-
+  bool _hasScannedQR = false;
   bool _hasPermissions = false;
   @override
   void initState() {
@@ -217,11 +219,11 @@ class InteractiveMapState extends State<InteractiveMap>
         double? direction = snapshot.data!.heading;
 
         if (direction == null) {
-          return Center(child: Text('Device does not have sensors'));
+          return const Center(child: Text('Device does not have sensors'));
         }
 
         return Center(
-          child: Container(
+          child: SizedBox(
               height: MediaQuery.of(context).size.height,
               child: Stack(
                 alignment: const Alignment(-1.0 + .5 * 2, -1.0 + .7 * 2),
@@ -231,7 +233,7 @@ class InteractiveMapState extends State<InteractiveMap>
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: const Color.fromARGB(132, 224, 224, 224),
                           border: Border.all(
                             color: const Color.fromARGB(125, 0, 0, 0),
                             width: 2.0,
@@ -242,7 +244,7 @@ class InteractiveMapState extends State<InteractiveMap>
                         width: 128.0,
                         height: 128.0,
                       ),
-                      Container(
+                      SizedBox(
                         width: 140.0,
                         height: 140.0,
                         child: Transform.rotate(

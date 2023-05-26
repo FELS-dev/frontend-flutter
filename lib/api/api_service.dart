@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:sqflite/sqflite.dart';
 import '../models/choice.dart';
 import '../models/stand.dart';
 import '../models/treasure_hunt.dart';
