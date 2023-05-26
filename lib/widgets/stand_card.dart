@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class ExpandableCard extends StatefulWidget {
   final String title;
   final String text;
-  const ExpandableCard({Key? key, required this.title, required this.text})
+  final String image;
+  const ExpandableCard(
+      {Key? key, required this.title, required this.text, required this.image})
       : super(key: key);
 
   @override
@@ -57,13 +59,13 @@ class ExpandableCardState extends State<ExpandableCard> {
                             child: AspectRatio(
                               aspectRatio: 16 / 9,
                               child: Image.asset(
-                                'assets/images/paris.jpeg',
+                                widget.image,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
                           const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5)),
+                              padding: EdgeInsets.symmetric(vertical: 2)),
                           Text(
                             widget.title,
                             style: const TextStyle(color: Colors.white),
@@ -86,7 +88,7 @@ class ExpandableCardState extends State<ExpandableCard> {
                           const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16)),
                           Expanded(
-                            flex: 6,
+                            flex: 10,
                             child: SizedBox(
                               height: 400,
                               child: Column(
@@ -96,11 +98,19 @@ class ExpandableCardState extends State<ExpandableCard> {
                                     widget.title,
                                     style: const TextStyle(color: Colors.white),
                                   ),
+                                  const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5)),
                                   Text(
-                                    widget.text,
+                                    widget.text.length > 100
+                                        ? '${widget.text.substring(0, 100)}...'
+                                        : widget.text,
                                     style: const TextStyle(
-                                        color: Colors.grey, fontSize: 10),
+                                        color: Colors.white, fontSize: 10),
                                   ),
+                                  const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10)),
                                   InkWell(
                                     onTap: () {
                                       setState(() {
@@ -143,7 +153,7 @@ class ExpandableCardState extends State<ExpandableCard> {
                           Text(
                             widget.text,
                             style: const TextStyle(
-                                color: Colors.grey, fontSize: 14),
+                                color: Colors.white, fontSize: 14),
                           ),
                         ],
                       ),
