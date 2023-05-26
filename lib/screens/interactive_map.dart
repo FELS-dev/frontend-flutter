@@ -5,9 +5,7 @@ import 'package:front_end/widgets/stand_card.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:front_end/api/api_service.dart';
-
-import '../models/stand.dart';
+import '../widgets/mobile_scanner.dart';
 
 void main() {
   runApp(const InteractiveMap());
@@ -25,11 +23,12 @@ class InteractiveMapState extends State<InteractiveMap>
   final List<Map<String, double>> markers = [
     {'x': 0.5, 'y': 0.5},
     {'x': 0.3, 'y': 0.45},
+    {'x': 0.2, 'y': 0.55},
   ];
-  List<Map<String, String>> cardData = [
-    {'title': 'Title 1', 'text': 'Lorem ipsum 1'},
-    {'title': 'Title 2', 'text': 'Lorem ipsum 2'},
-    {'title': 'Title 3', 'text': 'Lorem ipsum 3'},
+  List<Map<String, String>> standsList = [
+    {'name': 'Title 1', 'description': 'Lorem ipsum 1'},
+    {'name': 'Title 2', 'description': 'Lorem ipsum 2'},
+    {'name': 'Title 3', 'description': 'Lorem ipsum 3'},
   ];
   final TransformationController transformationController =
       TransformationController();
@@ -39,6 +38,11 @@ class InteractiveMapState extends State<InteractiveMap>
   double screenHeight = 0.0;
   bool _hasScannedQR = false;
   bool _hasPermissions = false;
+  bool showScanner = false;
+  Map<String, double>? scannedPoint;
+
+  final qrScannerKey = GlobalKey<QRScannerWidgetState>();
+
   @override
   void initState() {
     super.initState();
@@ -46,18 +50,8 @@ class InteractiveMapState extends State<InteractiveMap>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
-    _fetchPermissionStatus();
-  }
 
-  Future<List<Stand>> fetchStands() async {
-    try {
-      List<Stand> stands = await ApiService().getStands();
-      return stands;
-    } catch (e) {
-      // Gérez les erreurs ou renvoyez une liste vide si nécessaire
-      print('Error fetching stands: $e');
-      return [];
-    }
+    _fetchPermissionStatus();
   }
 
   void _fetchPermissionStatus() {
@@ -99,112 +93,136 @@ class InteractiveMapState extends State<InteractiveMap>
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Stand>>(
-      future: fetchStands(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Afficher un indicateur de chargement pendant que les stands sont récupérés
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          // Afficher un message d'erreur s'il y a une erreur lors de la récupération des stands
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          // Afficher le widget avec les stands une fois qu'ils sont récupérés avec succès
-          List<Stand> standsList = snapshot.data!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        screenWidth = constraints.maxWidth;
+        screenHeight = constraints.maxHeight;
 
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              screenWidth = constraints.maxWidth;
-              screenHeight = constraints.maxHeight;
-
-              return Stack(
+        return Stack(
+          children: <Widget>[
+            InteractiveViewer(
+              minScale: 0.1,
+              maxScale: 10.0,
+              scaleEnabled: true,
+              transformationController: transformationController,
+              child: Stack(
                 children: <Widget>[
-                  InteractiveViewer(
-                    minScale: 0.1,
-                    maxScale: 10.0,
-                    scaleEnabled: true,
-                    transformationController: transformationController,
-                    child: Stack(
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/images/eventMap.png',
-                          height: screenHeight,
-                          width: screenWidth,
+                  Image.asset(
+                    'assets/images/eventMap.png',
+                    height: screenHeight,
+                    width: screenWidth,
+                  ),
+                  // List all pins
+                  ...markers.map(
+                    (marker) => Positioned(
+                      left: marker['x']! * screenWidth,
+                      top: marker['y']! * screenHeight,
+                      child: Container(
+                        width: 2,
+                        height: 2,
+                        decoration: const BoxDecoration(
+                          color: Colors.pinkAccent,
+                          shape: BoxShape.circle,
                         ),
-                        // List all pins
-                        ...markers.map(
-                          (marker) => Positioned(
-                            left: marker['x']! * screenWidth,
-                            top: marker['y']! * screenHeight,
-                            child: Container(
-                              width: 2,
-                              height: 2,
-                              decoration: const BoxDecoration(
-                                color: Colors.pinkAccent,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IgnorePointer(
-                    ignoring: true,
-                    child: Builder(
-                      builder: (context) {
-                        if (_hasPermissions) {
-                          return _buildCompass(context);
-                        } else {
-                          return _buildPermissionSheet();
-                        }
-                      },
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SizedBox(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: standsList.map((stand) {
-                                return ExpandableCard(
-                                  title: stand.name!,
-                                  text: stand.description!,
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    top: 16.0,
-                    right: 16.0,
-                    child: FloatingActionButton(
-                      onPressed: () => centerAndZoomOnPoint(
-                          Point(markers[0]['x']!, markers[0]['y']!)),
-                      child: const Icon(Icons.zoom_in),
+                      ),
                     ),
                   ),
                 ],
-              );
-            },
-          );
-        } else {
-          // Afficher un message par défaut si les stands ne sont pas disponibles
-          return Text('No stands available.');
-        }
+              ),
+            ),
+            IgnorePointer(
+              ignoring: _hasPermissions,
+              child: Builder(
+                builder: (context) {
+                  if (_hasPermissions) {
+                    return _buildCompass(context);
+                  } else {
+                    return _buildPermissionSheet();
+                  }
+                },
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: standsList.map((stand) {
+                          return ExpandableCard(
+                            title: stand['name']!,
+                            text: stand['description']!,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            if (showScanner)
+              Expanded(
+                child: QRScannerWidget(
+                  key: qrScannerKey,
+                  onDetect: (List<Barcode> barcodes, Uint8List? image) {
+                    setState(
+                      () {
+                        if (barcodes.isNotEmpty) {
+                          var parts = barcodes[0].rawValue?.split(',');
+                          if (parts!.length == 2) {
+                            var x = double.tryParse(parts[0].trim());
+                            var y = double.tryParse(parts[1].trim());
+
+                            if (x != null && y != null) {
+                              scannedPoint = {'x': x, 'y': y};
+                              _hasScannedQR = true;
+                              qrScannerKey.currentState?.stopScan();
+                              showScanner = false;
+                              centerAndZoomOnPoint(
+                                Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                              );
+                            }
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            Positioned(
+              top: 16.0,
+              right: 16.0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    showScanner = true;
+                  });
+                  qrScannerKey.currentState?.startScan();
+                },
+                child: const Icon(Icons.qr_code_scanner),
+              ),
+            ),
+            if (_hasScannedQR && scannedPoint != null)
+              Positioned(
+                top: 86.0,
+                right: 16.0,
+                child: FloatingActionButton(
+                  onPressed: () => centerAndZoomOnPoint(
+                    Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                  ),
+                  child: const Icon(Icons.my_location),
+                ),
+              ),
+          ],
+        );
       },
     );
   }
 
   Widget _buildCompass(BuildContext context) {
-    // Votre code pour construire le widget de la boussole
     return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: ((context, snapshot) {
