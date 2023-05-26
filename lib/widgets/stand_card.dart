@@ -103,7 +103,7 @@ class ExpandableCardState extends State<ExpandableCard> {
                                           EdgeInsets.symmetric(vertical: 5)),
                                   Text(
                                     widget.text.length > 100
-                                        ? widget.text.substring(0, 100) + '...'
+                                        ? '${widget.text.substring(0, 100)}...'
                                         : widget.text,
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 10),
