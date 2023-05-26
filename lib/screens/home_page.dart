@@ -19,11 +19,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  static final List<Widget> _pages = <Widget>[QRCodePage(), InteractiveMap(), QuizScreen()];
+  static final List<Widget> _pages = <Widget>[
+    QRCodePage(),
+    InteractiveMap(),
+    QuizScreen()
+  ];
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Vivatech'),
