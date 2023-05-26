@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../api/api_service.dart';
-import '../models/treasure_hunt.dart';
-import '../models/choice.dart';
 import './home_page.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -10,23 +7,76 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  List<TreasureHunt> questionList = [];
+  List<Map<String, dynamic>> questionList = [
+    {
+      "id": 1,
+      "question": "Où se déroule généralement VivaTech ?",
+      "choices": [
+        {"id": 1, "choice": "Londres", "isCorrect": false},
+        {"id": 2, "choice": "Paris", "isCorrect": true},
+        {"id": 3, "choice": "Berlin", "isCorrect": false},
+      ]
+    },
+    {
+      "id": 2,
+      "question": "Quel est le principal thème de VivaTech ?",
+      "choices": [
+        {"id": 1, "choice": "Innovation et technologie", "isCorrect": true},
+        {"id": 2, "choice": "Art et littérature", "isCorrect": false},
+        {"id": 3, "choice": "Mode et design", "isCorrect": false},
+      ]
+    },
+    {
+      "id": 3,
+      "question": "En quelle année a eu lieu la première édition de VivaTech ?",
+      "choices": [
+        {"id": 1, "choice": "2010", "isCorrect": false},
+        {"id": 2, "choice": "2015", "isCorrect": false},
+        {"id": 3, "choice": "2016", "isCorrect": true},
+      ]
+    },
+    {
+      "id": 4,
+      "question": "VivaTech met en avant les startups de quel secteur ?",
+      "choices": [
+        {"id": 1, "choice": "Technologie et numérique", "isCorrect": true},
+        {"id": 2, "choice": "Alimentation et restauration", "isCorrect": false},
+        {"id": 3, "choice": "Textile et habillement", "isCorrect": false},
+      ]
+    },
+    {
+      "id": 5,
+      "question": "VivaTech est organisé par quelle entreprise ?",
+      "choices": [
+        {"id": 1, "choice": "Microsoft", "isCorrect": false},
+        {"id": 2, "choice": "Publicis Groupe et Les Échos", "isCorrect": true},
+        {"id": 3, "choice": "Apple", "isCorrect": false},
+      ]
+    },
+    {
+      "id": 6,
+      "question": "VivaTech s’adresse à quel type de public ?",
+      "choices": [
+        {"id": 1, "choice": "Professionnels de la technologie et grand public", "isCorrect": true},
+        {"id": 2, "choice": "Professionnels de la santé uniquement", "isCorrect": false},
+        {"id": 3, "choice": "Étudiants uniquement", "isCorrect": false},
+      ]
+    },
+    {
+      "id": 7,
+      "question": "VivaTech accueille des conférences de qui ?",
+      "choices": [
+        {"id": 1, "choice": "Célébrités du cinéma uniquement", "isCorrect": false},
+        {"id": 2, "choice": "dirigeants d'entreprises technologiques, entrepreneurs", "isCorrect": true},
+        {"id": 3, "choice": "Musiciens uniquement", "isCorrect": false},
+      ]
+    },
+
+    // Add more questions as needed
+  ];
   int currentQuestionIndex = 0;
   int score = 0;
-  Choice? selectedChoice;
-
-  final apiService = ApiService();
-
-  @override
-  void initState() {
-    super.initState();
-    loadQuestions();
-  }
-
-  void loadQuestions() async {
-    questionList = await apiService.getQuestions();
-    setState(() {});
-  }
+  Map<String, dynamic>? selectedChoice;
 
   @override
   Widget build(BuildContext context) {
@@ -45,19 +95,10 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
             _questionWidget(),
-            FutureBuilder<List<Choice>>(
-              future: apiService.getChoices(questionList[currentQuestionIndex].id),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return Column(
-                    children: snapshot.data!.map((choice) => _answerButton(choice)).toList(),
-                  );
-                }
-              },
+            Column(
+              children: questionList[currentQuestionIndex]["choices"]
+                  .map<Widget>((choice) => _answerButton(choice))
+                  .toList(),
             ),
             _nextButton(),
           ],
@@ -97,7 +138,7 @@ class _QuizScreenState extends State<QuizScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            questionList[currentQuestionIndex].question,
+            questionList[currentQuestionIndex]["question"],
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -109,8 +150,8 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _answerButton(Choice choice) {
-    bool isSelected = selectedChoice?.id == choice.id;
+  Widget _answerButton(Map<String, dynamic> choice) {
+    bool isSelected = selectedChoice?["id"] == choice["id"];
 
     return Container(
       width: double.infinity,
@@ -127,7 +168,7 @@ class _QuizScreenState extends State<QuizScreen> {
             selectedChoice = choice;
           });
         },
-        child: Text(choice.choice),
+        child: Text(choice["choice"]),
       ),
     );
   }
@@ -148,7 +189,7 @@ class _QuizScreenState extends State<QuizScreen> {
           foregroundColor: Colors.white,
         ),
         onPressed: selectedChoice != null ? () {
-          if (selectedChoice!.isCorrect) {
+          if (selectedChoice!["isCorrect"]) {
             score++;
           }
 
