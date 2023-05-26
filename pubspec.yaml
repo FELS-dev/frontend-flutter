@@ -43,6 +43,7 @@ dependencies:
   shared_preferences: ^2.1.1
   flutter_compass: ^0.7.0
   permission_handler: ^10.2.0
+  flutter_animate: ^4.1.1+1
 
 dev_dependencies:
   flutter_test:
