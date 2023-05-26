@@ -54,7 +54,7 @@ class _QRCodePageState extends State<QRCodePage> {
                       );
                     } else {
                       // Gérer le cas où les données ne sont pas encore disponibles
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     }
                   },
                 ),

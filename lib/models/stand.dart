@@ -1,16 +1,19 @@
-import 'dart:convert';
-import './treasure_hunt.dart';
-
 class Stand {
   int id;
-  String ?name;
-  String ?description;
-  double ?locationX;
-  double ?locationY;
-  String ?qrCode;
+  String? name;
+  String? description;
+  double? locationX;
+  double? locationY;
+  String? qrCode;
   // List<TreasureHunt> ?treasureHunts;
   // Stand({required this.id, this.name, this.description, this.locationX, this.locationY, this.qrCode,this.treasureHunts = const []});
-  Stand({required this.id, this.name, this.description, this.locationX, this.locationY, this.qrCode});
+  Stand(
+      {required this.id,
+      this.name,
+      this.description,
+      this.locationX,
+      this.locationY,
+      this.qrCode});
 
   factory Stand.fromJson(Map<String, dynamic> json) {
     return Stand(
@@ -21,7 +24,6 @@ class Stand {
       locationY: json['location_y'],
       qrCode: json['qr_code'],
       // treasureHunts: (json['treasure_hunts'] as List).map((i) => TreasureHunt.fromJson(i)).toList()
-
     );
   }
 

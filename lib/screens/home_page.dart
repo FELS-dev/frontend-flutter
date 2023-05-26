@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front_end/screens/interactive_map.dart';
 import 'package:front_end/screens/qr_code.dart';
+import 'package:front_end/screens/quiz_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  static const List<Widget> _pages = <Widget>[QRCodePage(), InteractiveMap()];
+  static final List<Widget> _pages = <Widget>[QRCodePage(), InteractiveMap(), QuizScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +27,19 @@ class _HomePageState extends State<HomePage> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Vivatech'),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFF0081),
+                  Color(0xFFFF00E4),
+                  Color(0xFFF15700),
+                ],
+              ),
+            ),
+          ),
         ),
         body: _pages[currentIndex],
         bottomNavigationBar: BottomNavigationBar(

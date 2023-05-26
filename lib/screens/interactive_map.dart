@@ -1,8 +1,11 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:front_end/widgets/stand_card.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import '../widgets/mobile_scanner.dart';
 
 void main() {
   runApp(const InteractiveMap());
@@ -18,13 +21,14 @@ class InteractiveMap extends StatefulWidget {
 class InteractiveMapState extends State<InteractiveMap>
     with TickerProviderStateMixin {
   final List<Map<String, double>> markers = [
-    {'x': 0.4, 'y': 0.5},
+    {'x': 0.5, 'y': 0.5},
     {'x': 0.3, 'y': 0.45},
+    {'x': 0.2, 'y': 0.55},
   ];
-  List<Map<String, String>> cardData = [
-    {'title': 'Title 1', 'text': 'Lorem ipsum 1'},
-    {'title': 'Title 2', 'text': 'Lorem ipsum 2'},
-    {'title': 'Title 3', 'text': 'Lorem ipsum 3'},
+  List<Map<String, String>> standsList = [
+    {'name': 'Title 1', 'description': 'Lorem ipsum 1'},
+    {'name': 'Title 2', 'description': 'Lorem ipsum 2'},
+    {'name': 'Title 3', 'description': 'Lorem ipsum 3'},
   ];
 
   final ScrollController scrollController = ScrollController();
@@ -34,8 +38,12 @@ class InteractiveMapState extends State<InteractiveMap>
   late Animation<Matrix4> animationZoom;
   double screenWidth = 0.0;
   double screenHeight = 0.0;
-
+  bool _hasScannedQR = false;
   bool _hasPermissions = false;
+  bool showScanner = false;
+  Map<String, double>? scannedPoint;
+
+  final qrScannerKey = GlobalKey<QRScannerWidgetState>();
 
   @override
   void initState() {
@@ -167,10 +175,10 @@ class InteractiveMapState extends State<InteractiveMap>
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        children: cardData.map((data) {
+                        children: standsList.map((stand) {
                           return ExpandableCard(
-                            title: data['title']!,
-                            text: data['text']!,
+                            title: stand['name']!,
+                            text: stand['description']!,
                           );
                         }).toList(),
                       ),
@@ -179,15 +187,59 @@ class InteractiveMapState extends State<InteractiveMap>
                 },
               ),
             ),
+            if (showScanner)
+              Expanded(
+                child: QRScannerWidget(
+                  key: qrScannerKey,
+                  onDetect: (List<Barcode> barcodes, Uint8List? image) {
+                    setState(
+                      () {
+                        if (barcodes.isNotEmpty) {
+                          var parts = barcodes[0].rawValue?.split(',');
+                          if (parts!.length == 2) {
+                            var x = double.tryParse(parts[0].trim());
+                            var y = double.tryParse(parts[1].trim());
+
+                            if (x != null && y != null) {
+                              scannedPoint = {'x': x, 'y': y};
+                              _hasScannedQR = true;
+                              qrScannerKey.currentState?.stopScan();
+                              showScanner = false;
+                              centerAndZoomOnPoint(
+                                Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                              );
+                            }
+                          }
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
             Positioned(
               top: 16.0,
               right: 16.0,
               child: FloatingActionButton(
-                onPressed: () => centerAndZoomOnPoint(
-                    Point(markers[0]['x']!, markers[0]['y']!)),
-                child: const Icon(Icons.zoom_in),
+                onPressed: () {
+                  setState(() {
+                    showScanner = true;
+                  });
+                  qrScannerKey.currentState?.startScan();
+                },
+                child: const Icon(Icons.qr_code_scanner),
               ),
             ),
+            if (_hasScannedQR && scannedPoint != null)
+              Positioned(
+                top: 86.0,
+                right: 16.0,
+                child: FloatingActionButton(
+                  onPressed: () => centerAndZoomOnPoint(
+                    Point(scannedPoint!['x']!, scannedPoint!['y']!),
+                  ),
+                  child: const Icon(Icons.my_location),
+                ),
+              ),
           ],
         );
       },
@@ -209,11 +261,11 @@ class InteractiveMapState extends State<InteractiveMap>
         double? direction = snapshot.data!.heading;
 
         if (direction == null) {
-          return Center(child: Text('Device does not have sensors'));
+          return const Center(child: Text('Device does not have sensors'));
         }
 
         return Center(
-          child: Container(
+          child: SizedBox(
               height: MediaQuery.of(context).size.height,
               child: Stack(
                 alignment: const Alignment(-1.0 + .5 * 2, -1.0 + .7 * 2),
@@ -223,7 +275,7 @@ class InteractiveMapState extends State<InteractiveMap>
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: const Color.fromARGB(132, 224, 224, 224),
                           border: Border.all(
                             color: const Color.fromARGB(125, 0, 0, 0),
                             width: 2.0,
@@ -234,7 +286,7 @@ class InteractiveMapState extends State<InteractiveMap>
                         width: 128.0,
                         height: 128.0,
                       ),
-                      Container(
+                      SizedBox(
                         width: 140.0,
                         height: 140.0,
                         child: Transform.rotate(

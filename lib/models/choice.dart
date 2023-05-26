@@ -11,7 +11,7 @@ class Choice {
       id: json['id'],
       huntId: json['hunt_id'],
       choice: json['choice'],
-      isCorrect: json['is_correct'],
+      isCorrect: json['is_correct'] == 1,
     );
   }
 
