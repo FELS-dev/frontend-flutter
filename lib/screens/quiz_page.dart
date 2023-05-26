@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api/api_service.dart';
 import '../models/treasure_hunt.dart';
 import '../models/choice.dart';
+import './home_page.dart';
 
 class QuizScreen extends StatefulWidget {
   @override
@@ -172,14 +173,12 @@ class _QuizScreenState extends State<QuizScreen> {
         style: TextStyle(color: isPassed ? Colors.green : Colors.redAccent),
       ),
       content: ElevatedButton(
-        child: const Text("Restart"),
+        child: const Text("Accueil"),
         onPressed: () {
-          Navigator.pop(context);
-          setState(() {
-            currentQuestionIndex = 0;
-            score = 0;
-            selectedChoice = null;
-          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
         },
       ),
     );
