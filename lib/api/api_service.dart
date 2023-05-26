@@ -89,6 +89,10 @@ class ApiService {
         await _databaseHelper.getTreasureHuntsByStandId(standId);
     return question;
   }
+  Future<List<TreasureHunt>> getQuestions() async {
+    List<TreasureHunt> questions = await _databaseHelper.getTreasureHunts();
+    return questions;
+  }
 
   Future<List<Choice>> getChoices(int questionId) async {
     List<Choice> choices = await _databaseHelper.getChoicesByHuntId(questionId);
