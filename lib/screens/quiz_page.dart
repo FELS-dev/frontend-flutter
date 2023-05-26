@@ -38,7 +38,7 @@ class _QuizScreenState extends State<QuizScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             const Text(
-              "Simple Quiz App",
+              "Quiz",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -85,7 +85,15 @@ class _QuizScreenState extends State<QuizScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.orangeAccent,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFF0081),
+                Color(0xFFFF00E4),
+                Color(0xFFF15700),
+              ],
+            ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
@@ -111,7 +119,7 @@ class _QuizScreenState extends State<QuizScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: const StadiumBorder(),
-          backgroundColor: isSelected ? Colors.orangeAccent : Colors.white,
+          backgroundColor: isSelected ? Color(0xFFF15700) : Colors.white,
           foregroundColor: isSelected ? Colors.white : Colors.black,
         ),
         onPressed: () {
@@ -153,7 +161,7 @@ class _QuizScreenState extends State<QuizScreen> {
             });
           }
         } : null,
-        child: Text(isLastQuestion ? "Submit" : "Next"),
+        child: Text(isLastQuestion ? "Soumettre" : "Suivant"),
       ),
     );
   }
@@ -169,7 +177,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return AlertDialog(
       title: Text(
-        "nombre de réponses correctes  $score",
+        "Nombre de réponses correctes  $score",
         style: TextStyle(color: isPassed ? Colors.green : Colors.redAccent),
       ),
       content: ElevatedButton(
